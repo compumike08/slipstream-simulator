@@ -1,13 +1,10 @@
 package michael.mh.slipstreamsimulator;
 
-import java.util.Collection;
 import org.graphstream.algorithm.generator.Generator;
 import org.graphstream.algorithm.generator.RandomGenerator;
 import org.graphstream.graph.Graph;
-import org.graphstream.graph.Edge;
 import org.graphstream.graph.implementations.SingleGraph;
 import java.util.Random;
-import org.graphstream.graph.Node;
 
 public class Slipstream {
     private Graph slipstreamGraph;
@@ -18,11 +15,11 @@ public class Slipstream {
     
     public void displayGraph() {
         slipstreamGraph.display();
-        slipstreamGraph.getNodeSet().stream().forEach((node) -> {
+        slipstreamGraph.nodes().forEach((node) -> {
             System.out.println("Node Id: " + node.getId());
             System.out.println("Is Slippoint: " + node.getAttribute("isSlippoint"));
-            if (node.getAttribute("isSlippoint")) {
-                StarSystem starSystem = node.getAttribute("starSystem");
+            if (node.getAttribute("isSlippoint", Boolean.class)) {
+                StarSystem starSystem = node.getAttribute("starSystem", StarSystem.class);
                 System.out.println("Star System: " + starSystem.getName());
             }
         });
@@ -67,32 +64,34 @@ public class Slipstream {
             num3 = rand.nextInt(49) + 1;
         }
         
-        int loopCount = 0;
+        final int num1Final = num1;
+        final int num2Final = num2;
+        final int num3Final = num3;
         
-        for (Node node : slipstreamGraph.getEachNode()) {
-            loopCount++;
-            if (loopCount != num1 && loopCount != num2 && loopCount != num3) {
+        slipstreamGraph.nodes().forEach(node -> {
+            int loopCount = node.getIndex();
+            if (loopCount != num1Final && loopCount != num2Final && loopCount != num3Final) {
                 node.setAttribute("isSlippoint", false);
-            } else if (loopCount == num1) {
+            } else if (loopCount == num1Final) {
                 node.setAttribute("isSlippoint", true);
                 node.setAttribute("starSystem", solSystem);
-            } else if (loopCount == num2) {
+            } else if (loopCount == num2Final) {
                 node.setAttribute("isSlippoint", true);
                 node.setAttribute("starSystem", alphaCSystem);
-            } else if (loopCount == num3) {
+            } else if (loopCount == num3Final) {
                 node.setAttribute("isSlippoint", true);
                 node.setAttribute("starSystem", vegaSystem);
             }
-        }
+        });
     }
     
     private void assignEdgeDistances() {
         Random rand = new Random();
         
-        for (Edge edge : slipstreamGraph.getEachEdge()) {
+        slipstreamGraph.edges().forEach(edge -> {
             int distance = rand.nextInt(4) + 1;
             edge.setAttribute("distance", distance);
-        }
+        });
     }
 
 }
